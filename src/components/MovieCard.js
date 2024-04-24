@@ -63,10 +63,10 @@ export default function MovieCard(props) {
                 </div>
                 <div className='Button-Container'>
                     <div className="Button-Wrapper" onClick={handleLiked}>
-                        <LikeIcon height="40px" width="40px" fill={liked ? "green" : "grey"} />
+                        <LikeIcon height="40px" width="40px" fill={liked ? "green" : "black"} />
                     </div>
                     <div className="Button-Wrapper" onClick={handleDisliked}>
-                        <DislikeIcon height="40px" width="40px" fill={disliked ? "red" : "grey"} />
+                        <DislikeIcon height="40px" width="40px" fill={disliked ? "red" : "black"} />
                     </div>
                 </div>
             </div>

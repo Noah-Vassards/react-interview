@@ -12,6 +12,8 @@ function App() {
   const [options, setOptions] = useState([])
   const [filters, setFilters] = useState([])
   const [filteredMovies, setFilteredMovies] = useState(movies)
+  const [disablePrev, setDisablePrev] = useState(true)
+  const [disableNext, setDisableNext] = useState(false)
 
   useEffect(() => {
     async function fetchData() {
@@ -49,7 +51,14 @@ function App() {
     }
     const updateFilteredMovies = movies.filter(movie => filters.some(obj => obj.value === movie.category.toLowerCase()))
     setFilteredMovies(updateFilteredMovies)
+    setPageBegin(0)
+    setPageEnd(paging)
   }, [movies, filters])
+
+  useEffect(() => {
+    filteredMovies.length <= paging || filteredMovies.length <= pageEnd ? setDisableNext(true) : setDisableNext(false)
+    pageBegin === 0 ? setDisablePrev(true) : setDisablePrev(false)
+  }, [filteredMovies, paging, pageBegin])
 
   const handleOnLike = (id, prevLiked, prevDisliked) => {
     const updatedMovies = movies.map(movie => {
@@ -89,6 +98,7 @@ function App() {
 
   const handlePrevious = () => {
     if (pageBegin <= 0) {
+      setDisablePrev(true)
       return;
     }
     setPageBegin(prevState => prevState - paging)
@@ -98,6 +108,7 @@ function App() {
 
   const handleNext = () => {
     if (pageEnd >= movies.length) {
+      setDisableNext(true)
       return;
     }
     setPageBegin(prevState => prevState + paging)
@@ -114,20 +125,50 @@ function App() {
     <div className="App">
       <div className='Body'>
         <div className='Movie-Container-Header'>
-          <Select
-            options={[{ value: 4, label: 4 }, { value: 8, label: 8 }, { value: 12, label: 12 }]}
-            onChange={choice => handlePaging(choice.value)}
-            defaultValue={{ value: 12, label: 12 }}
-          />
-          <button onClick={handlePrevious}>{'<<'}</button>
-          <button onClick={handleNext}>{'>>'}</button>
-          <Select
-            options={options}
-            isMulti
-            placeholder='Filters'
-            onChange={choices => setFilters(choices)}
-            value={filters}
-          />
+          <div style={{ height: '90%', maxWidth: '10%' }}>
+            <Select
+              options={[{ value: 4, label: 4 }, { value: 8, label: 8 }, { value: 12, label: 12 }]}
+              onChange={choice => handlePaging(choice.value)}
+              defaultValue={{ value: 12, label: 12 }}
+              styles={{
+                valueContainer: (provided, state) => ({
+                  ...provided,
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  flexWrap: 'nowrap',
+                  minWidth: '40%'
+                }),
+                input: (provided, state) => ({
+                  ...provided,
+                  minWidth: '20%'
+                })
+              }}
+            />
+          </div>
+          <button onClick={handlePrevious} disabled={disablePrev}>{'<<'}</button>
+          <button onClick={handleNext} disabled={disableNext}>{'>>'}</button>
+          <div style={{ height: '90%', maxWidth: '30%' }}>
+            <Select
+              options={options}
+              isMulti
+              placeholder='Filters'
+              onChange={choices => setFilters(choices)}
+              value={filters}
+              styles={{
+                valueContainer: (provided, state) => ({
+                  ...provided,
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  flexWrap: 'nowrap',
+                  minWidth: '40%'
+                }),
+                input: (provided, state) => ({
+                  ...provided,
+                  minWidth: '20%'
+                })
+              }}
+            />
+          </div>
         </div>
         <div className='Movie-Container'>
           {filteredMovies.slice(pageBegin, pageEnd).map((movie, index) =>
@@ -143,8 +184,8 @@ function App() {
           )}
         </div>
         <div className='Movie-Container-Footer'>
-          <button onClick={handlePrevious}>{'<<'}</button>
-          <button onClick={handleNext}>{'>>'}</button>
+          <button onClick={handlePrevious} disabled={disablePrev}>{'<<'}</button>
+          <button onClick={handleNext} disabled={disableNext}>{'>>'}</button>
         </div>
       </div>
     </div>
